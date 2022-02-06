@@ -55,7 +55,7 @@ Brief description of each folder content
 
 ## License
 
-```MD
+```markdown
 MIT License
 
 Copyright (c) 2021
