@@ -1,0 +1,33 @@
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: ro-filesystem
+spec:
+  hostNetwork: false
+  forbiddenSysctls:
+    - "*"
+  hostIPC: false
+  hostPID: false
+  supplementalGroups:
+    rule: "MustRunAs"
+    ranges:
+      - min: 1
+        max: 65535
+  privileged: false
+  fsGroup:
+    rule: "MustRunAs"
+    ranges:
+      - min: 1
+        max: 65535
+  seLinux:
+    rule: "RunAsAny"
+  runAsUser:
+    rule: "MustRunAsNonRoot"
+  runAsGroup:
+    rule: "MustRunAs"
+    ranges:
+      - min: 1
+        max: 65535
+  readOnlyRootFilesystem: true
+  defaultAllowPrivilegeEscalation: false
+  allowPrivilegeEscalation: false

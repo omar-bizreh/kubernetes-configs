@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: mysql-svc
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: mysql
+          image: localhost:32000/percona:latest
+          ports:
+            - containerPort: 3306
+              name: mysql-port
+          env:
+            - name: MYSQL_USER
+              value: monty
+            - name: MYSQL_DATABASE
+              value: some_name
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dbsecret
+                  key: MYSQL_PASSWORD
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dbsecret
+                  key: MYSQL_ROOT_PASSWORD
+          volumeMounts:
+            - mountPath: "/var/lib/mysql"
+              name: local-pv-storage
+      volumes:
+        - name: local-pv-storage
+          persistentVolumeClaim:
+            claimName: local-pvc

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deploy
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      automountServiceAccountToken: false
+      volumes:
+        - name: local-pv-storage
+          persistentVolumeClaim:
+            claimName: local-pvc
+      containers:
+        - name: mysql-pod
+          image: localhost:32000/percona:latest
+          env:
+            - name: MYSQL_USER
+              value: monty
+            - name: MYSQL_DATABASE
+              value: some_name
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dbsecret
+                  key: MYSQL_PASSWORD
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dbsecret
+                  key: MYSQL_ROOT_PASSWORD
+          volumeMounts:
+            - mountPath: "/var/lib/mysql"
+              name: local-pv-storage
+          resources:
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 3306
